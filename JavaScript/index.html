@@ -1,117 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather App</title>
+    <title>Weather Forecast</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", sans-serif;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #74ebd5, #ACB6E5); 
-            padding: 20px;
             min-height: 100vh;
+            background: url("https://static9.depositphotos.com/1593759/1168/i/450/depositphotos_11687543-stock-photo-the-sun-above-the-horizon.jpg") no-repeat center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 80px;
+            position: relative;
+        }
+
+        /* Light overlay for readability */
+        body::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 0;
+        }
+
+        h1 {
             color: #fff;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);
+            z-index: 1;
         }
 
-        .parent-container{
-            width: 45%;
-            margin: auto;
-            text-align: center;
-            padding: 20px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        .parent-container {
+            width: 90%;
+            max-width: 500px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            z-index: 1;
         }
 
-        .parent-container input{
-            padding:10px;
+        .parent-container input {
+            padding: 12px 18px;
             width: 70%;
             border: none;
             border-radius: 8px;
             outline: none;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .parent-container button{
-            padding: 10px 15px;
-            background: linear-gradient(to right, #4caf50, #81c784);
+        .parent-container button {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
             color: white;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 114, 255, 0.4);
         }
 
         .parent-container button:hover {
             transform: scale(1.05);
-            transition: 0.3s;
+            box-shadow: 0 0 20px rgba(0, 114, 255, 0.8);
         }
 
-        .result-container{
-            width: 50%;
-            margin: 30px auto 0;
+        .result-container {
+            width: 90%;
+            max-width: 500px;
+            margin-top: 40px;
+            z-index: 1;
         }
 
-        .city-card{
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            width: 100%;
-            padding: 15px;
-            margin-top: 20px;
+        .city-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
             border-radius: 15px;
-            background: linear-gradient(to right, #ffe0b2, #ffcc80); 
-            color: #000;
+            padding: 25px;
             text-align: center;
+            color: #fff;
+            animation: fadeIn 0.6s ease;
         }
 
-        .city-card span{
-            font-weight: bold;
+        .city-card p {
+            font-size: 22px;
+            margin: 10px 0;
         }
 
+        .city-card span {
+            font-weight: 700;
+            color: #ffe082;
+        }
+
+        .city-card sup {
+            font-size: 22px;
+            color: #fff;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
+
 <body>
+    <h1>🌤 Weather Forecast</h1>
+
     <form id="form" class="parent-container">
-        <input 
-            type="text"
-            placeholder="Enter city name"
-            id="city-name">
-        <button>Submit</button>
+        <input type="text" placeholder="Enter city name" id="city-name" />
+        <button>Search</button>
     </form>
+
     <div id="result" class="result-container"></div>
 
     <script>
-        var form=document.getElementById("form")
-        var result=document.getElementById("result")
-        var cityName=document.getElementById("city-name")
-        var apikey="c6069ebd04681fcead0b47d3b3070581"
+        var form = document.getElementById("form")
+        var result = document.getElementById("result")
+        var cityName = document.getElementById("city-name")
+        var apikey = "0a8e9e1f9a0215878bddeeedc1da2ef7"
 
-        form.addEventListener("submit",(e)=>{
+        form.addEventListener("submit", (e) => {
             e.preventDefault()
-            var apiurl=`https://api.openweathermap.org/data/2.5/weather?q=${cityName.value}&appid=${apikey}&units=metric`
+            var apiurl = `https://api.openweathermap.org/data/2.5/weather?q=${cityName.value}&appid=${apikey}&units=metric`
             fetch(apiurl)
-                .then((res)=> res.json())
-                .then((res)=>{
-                    if(res.cod=="404"){
-                        alert("City not found")
-                        return false
+                .then((res) => res.json())
+                .then((res) => {
+                    if (res.cod == "404") {
+                        alert("City not found!")
+                        return
                     }
-                    var weatherData={
+
+                    var weatherData = {
                         temp: res.main.temp,
                         country: res.sys.country,
-                        name: res.name
+                        name: res.name,
+                        desc: res.weather[0].description,
+                        icon: res.weather[0].icon
                     }
+
                     displayResult(weatherData)
                 })
         })
 
-        function displayResult(weatherData){
-            result.innerHTML=`
+        function displayResult(weatherData) {
+            result.innerHTML = `
                 <div class="city-card">
-                    <p><span>Name</span>: ${weatherData.name}</p>
-                    <p><span>Temp</span>: ${weatherData.temp} <sup>°C</sup></p>
-                    <p><span>Country</span>: ${weatherData.country}</p>
+                    <img src="https://openweathermap.org/img/wn/${weatherData.icon}@2x.png" alt="icon">
+                    <p><span>City:</span> ${weatherData.name}, ${weatherData.country}</p>
+                    <p><span>Temperature:</span> ${weatherData.temp} <sup>°C</sup></p>
+                    <p><span>Condition:</span> ${weatherData.desc}</p>
                 </div>
             `
         }
     </script>
 </body>
+
 </html>
